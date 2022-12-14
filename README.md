@@ -1,0 +1,2 @@
+# AlgoTrader
+Algorithmic Training project.

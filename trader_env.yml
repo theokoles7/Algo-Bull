@@ -1,0 +1,6 @@
+name: trader
+channels:
+  - defaults
+dependencies:
+  - python=3.11.4=h955ad1f_0
+  - pip

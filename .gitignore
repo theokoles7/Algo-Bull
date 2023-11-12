@@ -1,0 +1,14 @@
+# IDE's
+.vscode
+.idea
+
+# BUILD FILES
+build
+*.egg-info
+__pycache__
+
+# Logs
+logs
+
+# DATASET(S)
+data/

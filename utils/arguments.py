@@ -61,14 +61,14 @@ model.add_argument(
 model.add_argument(
     '--learning_rate',
     type =      float,
-    default =   0.1,
+    default =   0.001,
     help =      "Optimizer learning rate"
 )
 
 model.add_argument(
     '--batch_size',
     type =      int,
-    default =   16,
+    default =   32,
     help =      "Data batch size"
 )
 

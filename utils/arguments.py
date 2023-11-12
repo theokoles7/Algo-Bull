@@ -38,6 +38,13 @@ stock.add_argument(
 model = parser.add_argument_group('Model')
 
 model.add_argument(
+    '--look_ahead',
+    type =      int,
+    default =   30,
+    help =      "Prediction look ahead window"
+)
+
+model.add_argument(
     '--hidden_size',
     type =      int,
     default =   64,
@@ -49,6 +56,27 @@ model.add_argument(
     type =      int,
     default =   2,
     help =      "Number of LSTM layers (Defaults to 2)"
+)
+
+model.add_argument(
+    '--learning_rate',
+    type =      float,
+    default =   0.1,
+    help =      "Optimizer learning rate"
+)
+
+model.add_argument(
+    '--batch_size',
+    type =      int,
+    default =   16,
+    help =      "Data batch size"
+)
+
+model.add_argument(
+    '--epochs',
+    type =      int,
+    default =   50,
+    help =      "Number of epochs model will train for"
 )
 
 # LOGGING ---------------------------------------
@@ -67,6 +95,16 @@ logging.add_argument(
     choices =   ["none", "debug", "info", "warning", "error", "critical"],
     default =   "info",
     help =      "Maximum logging level (None > Debug > Info > Warning > Error > Critical)"
+)
+
+# OUTPUT
+output = parser.add_argument_group('Output')
+
+output.add_argument(
+    '--output_path',
+    type =      str,
+    default =   "output",
+    help =      "Path at which application will save output"
 )
 
 # END ARGUMENTS ===========================================================================

@@ -2,7 +2,7 @@
 
 import datetime, numpy as np, os, pandas as pd, torch, torch.nn as nn, traceback
 from matplotlib             import pyplot as plt
-from sklearn.preprocessing  import MinMaxScaler
+from sklearn.metrics        import accuracy_score
 from termcolor              import colored
 from tqdm                   import tqdm
 
@@ -13,7 +13,10 @@ from utils                  import ARGS, LOGGER
 if __name__ == '__main__':
     try:
         LOGGER.info(f"\n{open('utils/banner.txt', 'r').read()}")
-
+        
+        # Record arguments for logs
+        for key in vars(ARGS):
+            LOGGER.info(f"{key:<15}{ARGS.__getattribute__(key):>15}")
 
         # INITIALIZATION ==========================================================================
 
@@ -30,8 +33,9 @@ if __name__ == '__main__':
         LOGGER.debug(f"Model:\n{model}")
 
         # Place model on GPU if available
-        if torch.cuda.is_available(): model = model.cuda()
-        LOGGER.info(f"Using device: {torch.cuda.get_device_name()}")
+        device = 'cuda' if torch.cuda.is_available() else 'cpu'
+        model = model.to(device)
+        LOGGER.info(f"Using device: {device}")
 
         # Define loss function
         loss_func = nn.MSELoss(reduction="mean")
@@ -54,7 +58,7 @@ if __name__ == '__main__':
 
             LOGGER.info(f"BEGIN EPOCH {epoch + 1:>3} ================================================")
 
-            # Initialize running loss
+            # Initialize metrics for epoch
             running_loss_train, running_loss_val = 0.0, 0.0
 
             # Put model in training mode
@@ -67,7 +71,7 @@ if __name__ == '__main__':
                 for batch_X, batch_y in train:
 
                     # Move data set to GPU if available
-                    if torch.cuda.is_available(): batch_X, batch_y = batch_X.cuda(), batch_y.cuda()
+                    if torch.cuda.is_available(): batch_X, batch_y = batch_X.to(device), batch_y.to(device)
 
                     # Feed input to model and make predictions
                     predictions = model(batch_X)
@@ -90,13 +94,12 @@ if __name__ == '__main__':
                 # Put model in evaluation mode
                 pbar.set_postfix(status=colored("Validating", "yellow"))
                 model.eval()
-
                 with torch.no_grad():
 
                     for batch_X_val, batch_y_val in test:
 
                         # Move data set to GPU if available
-                        if torch.cuda.is_available(): batch_X_val, batch_y_val = batch_X_val.cuda(), batch_y_val.cuda()
+                        if torch.cuda.is_available(): batch_X_val, batch_y_val = batch_X_val.to(device), batch_y_val.to(device)
 
                         # Make predictions
                         predictions_val = model(batch_X_val)
@@ -147,7 +150,7 @@ if __name__ == '__main__':
                 for i in range(ARGS.look_ahead * 2):
 
                     # Prepare historical data
-                    history_tensor = torch.as_tensor(historical_data).view(1, -1, 1).float().cuda()
+                    history_tensor = torch.as_tensor(historical_data).view(1, -1, 1).float().to(device)
 
                     # Make forecasting prediction
                     prediction = model(history_tensor).cpu().numpy()[0, 0]

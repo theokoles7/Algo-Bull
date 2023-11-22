@@ -14,6 +14,14 @@ parser = argparse.ArgumentParser(
 stock = parser.add_argument_group('Stock')
 
 stock.add_argument(
+    'variables',
+    type =      str,
+    choices =   ["univariate", "multivariate"],
+    default =   "univariate",
+    help =      "Use only opening price (univariate) or use all features (multivariate)"
+)
+
+stock.add_argument(
     '--ticker',
     type =      str,
     default =   "AAPL",
@@ -75,7 +83,7 @@ model.add_argument(
 model.add_argument(
     '--epochs',
     type =      int,
-    default =   50,
+    default =   100,
     help =      "Number of epochs model will train for"
 )
 

@@ -17,10 +17,10 @@ stdout_handler.setFormatter(logging.Formatter('%(asctime)s | %(levelname)s | %(n
 LOGGER.addHandler(stdout_handler)
 
 # Verify that logging path exists
-os.makedirs(ARGS.logging_path, exist_ok=True)
+os.makedirs(f"{ARGS.logging_path}/{ARGS.ticker}/{ARGS.variables}/{ARGS.epochs}_epochs", exist_ok=True)
 
 # Define file handler
-file_handler = logging.FileHandler(f"{ARGS.logging_path}/trading-bot-{datetime.datetime.now().strftime('%Y%m%d_%H%M%S')}.log")
+file_handler = logging.FileHandler(f"{ARGS.logging_path}/{ARGS.ticker}/{ARGS.variables}/{ARGS.epochs}_epochs/trading-bot-{datetime.datetime.now().strftime('%Y%m%d_%H%M%S')}.log")
 file_handler.setLevel(logging.getLevelName(ARGS.logging_level.upper()))
 file_handler.setFormatter(logging.Formatter('%(asctime)s | %(levelname)s | %(name)s: %(message)s'))
 LOGGER.addHandler(file_handler)

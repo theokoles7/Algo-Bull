@@ -17,6 +17,7 @@ class LSTMUnivariate(nn.Module):
         """Iniitalize Univariate LSTM object.
 
         Args:
+            output_dir (str): Path to output (graphs) directory
             input_size (int, optional): Number of features in the input data at each time step. Defaults to 1.
             hidden_size (int, optional): Hidden units in LSTM layer. Defaults to 64.
             num_layers (int, optional): Number of LSTM layers. Defaults to 2.

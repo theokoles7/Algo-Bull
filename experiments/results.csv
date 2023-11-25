@@ -1,0 +1,21 @@
+VARIABILITY,TICKER,EPOCHS,BEST ACCURACY,BEST EPOCH
+univariate,AAPL,100,0.00012271,43
+univariate,AAPL,1000,0.00012193,82
+univariate,AMZN,100,0.00060012,70
+univariate,AMZN,1000,0.00060241,52
+univariate,GIB,100,0.00036038,99
+univariate,GIB,1000,0.00035906,151
+univariate,MSFT,100,0.00011587,98
+univariate,MSFT,1000,0.00011439,114
+univariate,TSLA,100,0.00104321,92
+univariate,TSLA,1000,0.00104444,61
+multivariate,AAPL,100,--,--
+multivariate,AAPL,1000,--,--
+multivariate,AMZN,100,--,--
+multivariate,AMZN,1000,--,--
+multivariate,GIB,100,--,--
+multivariate,GIB,1000,--,--
+multivariate,MSFT,100,--,--
+multivariate,MSFT,1000,--,--
+multivariate,TSLA,100,--,--
+multivariate,TSLA,1000,--,--

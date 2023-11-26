@@ -9,8 +9,8 @@ univariate,MSFT,100,0.00011587,98
 univariate,MSFT,1000,0.00011439,114
 univariate,TSLA,100,0.00104321,92
 univariate,TSLA,1000,0.00104444,61
-multivariate,AAPL,100,--,--
-multivariate,AAPL,1000,--,--
+multivariate,AAPL,100,0.0056305,1
+multivariate,AAPL,1000,0.00555914,1
 multivariate,AMZN,100,--,--
 multivariate,AMZN,1000,--,--
 multivariate,GIB,100,--,--

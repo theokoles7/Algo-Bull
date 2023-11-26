@@ -83,7 +83,7 @@ model.add_argument(
 model.add_argument(
     '--epochs',
     type =      int,
-    default =   100,
+    default =   1000,
     help =      "Number of epochs model will train for"
 )
 

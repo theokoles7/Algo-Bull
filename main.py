@@ -26,7 +26,7 @@ if __name__ == '__main__':
         os.makedirs(output_dir, exist_ok=True)
 
         # Initialize data set and model
-        data =  Stock(ARGS.variables, ARGS.ticker, ARGS.start_date, ARGS.end_date)
+        data =  Stock(ARGS.variability, ARGS.ticker, ARGS.start_date, ARGS.end_date)
         model = LSTMTrader(input_size=data.input_size, hidden_size=ARGS.hidden_size, num_layers=ARGS.layers, output_dir=output_dir)
 
         LOGGER.debug(f"Dataset:\n{data}")

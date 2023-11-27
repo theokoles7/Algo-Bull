@@ -14,7 +14,7 @@ parser = argparse.ArgumentParser(
 stock = parser.add_argument_group('Stock')
 
 stock.add_argument(
-    'variables',
+    'variability',
     type =      str,
     choices =   ["univariate", "multivariate"],
     default =   "univariate",

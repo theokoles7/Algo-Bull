@@ -1,6 +1,5 @@
 """Algo-Bull RNN models."""
 
-__all__ = ['lstm_univariate', 'lstm_multivariate']
+__all__ = ['lstm_trader']
 
-from models.lstm_univariate    import LSTMUnivariate
-from models.lstm_multivariate  import LSTMMultivariate
+from models.lstm_trader    import LSTMTrader

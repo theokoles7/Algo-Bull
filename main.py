@@ -7,8 +7,8 @@ from termcolor                  import colored
 from tqdm                       import tqdm
 from torchmetrics.functional    import r2_score
 
-from data                       import StockUnivariate, StockMultivariate
-from models                     import LSTMUnivariate, LSTMMultivariate
+from data                       import Stock
+from models                     import LSTMTrader
 from utils                      import ARGS, LOGGER
 
 if __name__ == '__main__':
@@ -25,17 +25,9 @@ if __name__ == '__main__':
         output_dir = f"{ARGS.output_path}/{ARGS.ticker}/{ARGS.variables}/{ARGS.epochs}_epochs/{datetime.datetime.now().strftime('%Y%m%d_%H%M%S')}"
         os.makedirs(output_dir, exist_ok=True)
 
-        data =  StockUnivariate(ARGS.variables, ARGS.ticker, ARGS.start_date, ARGS.end_date)
-        model = LSTMUnivariate(input_size=1, hidden_size=ARGS.hidden_size, num_layers=ARGS.layers, output_dir=output_dir)
-
-        # # Initialize dataset & model
-        # match ARGS.variables:
-        #     case 'univariate': 
-        #         data =  StockUnivariate(ARGS.ticker, ARGS.start_date, ARGS.end_date)
-        #         model = LSTMUnivariate(input_size=1, hidden_size=ARGS.hidden_size, num_layers=ARGS.layers, output_dir=output_dir)
-        #     case 'multivariate': 
-        #         data =  StockMultivariate(ARGS.ticker, ARGS.start_date, ARGS.end_date)
-        #         model = LSTMMultivariate(num_classes=50, input_size=4, hidden_size=2, num_layers=1, output_dir=output_dir)
+        # Initialize data set and model
+        data =  Stock(ARGS.variables, ARGS.ticker, ARGS.start_date, ARGS.end_date)
+        model = LSTMTrader(input_size=data.input_size, hidden_size=ARGS.hidden_size, num_layers=ARGS.layers, output_dir=output_dir)
 
         LOGGER.debug(f"Dataset:\n{data}")
         LOGGER.debug(f"Model:\n{model}")

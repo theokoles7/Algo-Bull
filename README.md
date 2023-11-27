@@ -3,7 +3,7 @@ Algorithmic Trading project.
 
 ## Dataset
 
-The data set for this initial version of the project uses [yfinance](https://pypi.org/project/yfinance/) to pull data for a stock security, with full rang eof historical data available (i.e., from the time that the stock was introduced to the market to the current date).
+The data set for this initial version of the project uses [yfinance](https://pypi.org/project/yfinance/) to pull data for a stock security, with full range of historical data available (i.e., from the time that the stock was introduced to the market to the current date).
 
 Example set for AAPL:
 ```
@@ -33,7 +33,11 @@ As the example shows, the set contains features for:
 * Adj Close: Closing price, adjusted for corporate actions
 * Volume: Traded volume during trading day
 
-## Model
+## Models
+
+### Univariate LSTM
+
+### Multivariate LSTM
 
 ---
 ## Implemented using:

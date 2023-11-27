@@ -1,8 +1,8 @@
 #!/bin/bash
 
-#################################################
-# Run univariate model on univariate stock data #
-#################################################
+###################################################
+# Run multivariate model on univariate stock data #
+###################################################
 # This will run the experiments with the
 # following default parameters:
 #   - Start date:       1900-01-01
@@ -19,6 +19,6 @@ do
     for ticker in AAPL AMZN GIB MSFT TSLA
     do
         clear
-        python main.py univariate --ticker $ticker --epochs $epochs
+        python main.py multivariate --ticker $ticker --epochs $epochs
     done
 done

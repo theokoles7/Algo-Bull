@@ -8,15 +8,16 @@ from torch.utils.data       import DataLoader, TensorDataset
 
 from utils.logger           import LOGGER
 
-class StockUnivariate():
+class Stock():
     """Dataset class."""
 
-    logger = LOGGER.getChild('stock-uni')
+    logger = LOGGER.getChild('stock')
 
-    def __init__(self, ticker: str, start_date: datetime.date | str = "1900-01-01", end_date: datetime.date | str = datetime.date.today().strftime("%Y-%m-%d")):
+    def __init__(self, variability: str, ticker: str, start_date: datetime.date | str = "1900-01-01", end_date: datetime.date | str = datetime.date.today().strftime("%Y-%m-%d")):
         """Initialize Stock object with only Open Price feature.
 
         Args:
+            variability (str): Univariate/Multivariate
             ticker (str): Ticker/stock symbol (i.e., AAPL, GOOG, AMZN)
             start_date (date | str, optional): Beginning of historical data being pulled. Defaults to "1900-01-01".
             end_date (date | str, optional): End of historical data. Defaults to today's date.
@@ -29,14 +30,26 @@ class StockUnivariate():
             start = start_date, 
             end =   end_date
         )
-
         self.logger.debug(f"Downloaded data:\n{self.data}")
+
+        self.target =       self.data.Open.values
 
         # Split data into training and testing sets
         self.logger.info("Splitting data into train and test sets")
 
-        self.train_data =   self.data[:math.ceil(len(self.data) * .8)].iloc[:,:1]
-        self.test_data =    self.data[math.ceil(len(self.data) * .8):].iloc[:,:1]
+        match variability:
+            case 'univariate':
+                self.train_data =   self.data[:math.ceil(len(self.data) * .8)].iloc[:,:1]
+                self.test_data =    self.data[math.ceil(len(self.data) * .8):].iloc[:,:1]
+            case 'multivariate':
+                self.train_data =   self.data.drop(columns=['Close', 'Adj Close'])[:math.ceil(len(self.data) * .8)].iloc[:]
+                self.test_data =    self.data.drop(columns=['Close', 'Adj Close'])[math.ceil(len(self.data) * .8):].iloc[:]
+
+        self.input_size =   self.train_data.shape[1]
+        self.logger.info(f"Input size: {self.input_size}")
+
+        self.logger.debug(f"Train shape after split: {self.train_data.shape}")
+        self.logger.debug(f"Test shape after split: {self.test_data.shape}")
 
         # Store raw data
         self.raw_train = self.train_data
@@ -52,14 +65,15 @@ class StockUnivariate():
         # Reshape
         self.logger.info("Reshaping sets")
 
-        self.train_data =   np.reshape(self.train_data.Open.values, (-1, 1))
-        self.test_data =    np.reshape(self.test_data.Open.values, (-1, 1))
+        self.train_data =   np.reshape(self.train_data.values, (-1, self.input_size))
+        self.test_data =    np.reshape(self.test_data.values, (-1, self.input_size))
 
-        self.logger.debug(f"Training set shape: {self.train_data.shape}")
-        self.logger.debug(f"Testing set shape: {self.test_data.shape}")
+        self.logger.debug(f"Training set shape after reshape: {self.train_data.shape}")
+        self.logger.debug(f"Testing set shape after reshape: {self.test_data.shape}")
 
         # Normalization
         self.logger.info("Normalizing data")
+        
         self.scaler = MinMaxScaler(feature_range=(0, 1))
         self.train_data =   self.scaler.fit_transform(self.train_data)
         self.test_data =    self.scaler.fit_transform(self.test_data)

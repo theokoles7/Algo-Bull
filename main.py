@@ -7,9 +7,8 @@ from termcolor                  import colored
 from tqdm                       import tqdm
 from torchmetrics.functional    import r2_score
 
-from data.stock_univariate      import StockUnivariate
-from data.stock_multivariate    import StockMultivariate
-from models.trader_lstm_univariate         import TraderLSTMUnivariate
+from data                       import Stock
+from models                     import LSTMTrader
 from utils                      import ARGS, LOGGER
 
 if __name__ == '__main__':
@@ -23,21 +22,32 @@ if __name__ == '__main__':
         # INITIALIZATION ==========================================================================
 
         # Initialize output directory
-        output_dir = f"{ARGS.output_path}/{ARGS.ticker}/{ARGS.variables}/{ARGS.epochs}_epochs/{datetime.datetime.now().strftime('%Y%m%d_%H%M%S')}"
+        output_dir = f"{ARGS.output_path}/{ARGS.ticker}/{ARGS.variability}/{ARGS.epochs}_epochs/{datetime.datetime.now().strftime('%Y%m%d_%H%M%S')}"
         os.makedirs(output_dir, exist_ok=True)
 
-        # Initialize dataset & model
-        match ARGS.variables:
-            case 'univariate': 
-                data =  StockUnivariate(ARGS.ticker, ARGS.start_date, ARGS.end_date)
-                model = TraderLSTMUnivariate(input_size=1, hidden_size=ARGS.hidden_size, num_layers=ARGS.layers, output_dir=output_dir)
-            case 'multivariate': 
-                data =  StockMultivariate(ARGS.ticker, ARGS.start_date, ARGS.end_date)
+        # Initialize data set and model
+        data =  Stock(ARGS.variability, ARGS.ticker, ARGS.start_date, ARGS.end_date)
+        model = LSTMTrader(input_size=data.input_size, hidden_size=ARGS.hidden_size, num_layers=ARGS.layers, output_dir=output_dir)
+
+        LOGGER.debug(f"Dataset:\n{data}")
+        LOGGER.debug(f"Model:\n{model}")
 
         # EXECUTION ===============================================================================
 
         # Execute on data
-        model.execute(data)
+        loss, epoch = model.execute(data)
+
+        # Record results
+        LOGGER.info("Recording results")
+        results_file = pd.read_csv('experiments/results.csv')
+        results_file.loc[
+            (results_file['VARIABILITY']==ARGS.variability) &
+            (results_file['TICKER']==ARGS.ticker) &
+            (results_file['EPOCHS']==ARGS.epochs),
+            ['BEST ACCURACY', 'BEST EPOCH'] 
+        ] = loss, epoch
+
+        results_file.to_csv('experiments/results.csv', index=False)
 
     except KeyboardInterrupt:
         LOGGER.critical("Keyboard interrupt detected...")

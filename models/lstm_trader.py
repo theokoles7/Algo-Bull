@@ -5,13 +5,13 @@ from matplotlib             import pyplot   as plt
 from termcolor              import colored
 from tqdm                   import tqdm
 
-from data.stock_univariate  import StockUnivariate
+from data.stock  import Stock
 from utils                  import ARGS, LOGGER
 
-class LSTMUnivariate(nn.Module):
+class LSTMTrader(nn.Module):
     """Univariate LSTM model."""
 
-    logger = LOGGER.getChild('lstm-uni')
+    logger = LOGGER.getChild('lstm')
 
     def __init__(self, output_dir: str, input_size: int = 1, hidden_size: int = 64, num_layers: int = 2):
         """Iniitalize Univariate LSTM object.
@@ -24,11 +24,13 @@ class LSTMUnivariate(nn.Module):
         """
         self.logger.info(f"Initializing model")
 
-        super(LSTMUnivariate, self).__init__()
+        super(LSTMTrader, self).__init__()
+
+        self.input_size = input_size
 
         # Define model
         self.lstm =     nn.LSTM(input_size, hidden_size, num_layers, batch_first=True)
-        self.linear =   nn.Linear(hidden_size, 1)
+        self.linear =   nn.Linear(hidden_size, input_size)
 
         # Place model on GPU if available
         self.device =   'cuda' if torch.cuda.is_available() else 'cpu'
@@ -59,7 +61,7 @@ class LSTMUnivariate(nn.Module):
         out, _ =    self.lstm(X)
         return      self.linear(out)
     
-    def execute(self, data: StockUnivariate) -> tuple[float, int]:
+    def execute(self, data: Stock) -> tuple[float, int]:
         """Execute model operations on provided data.
 
         Args:
@@ -117,18 +119,27 @@ class LSTMUnivariate(nn.Module):
         # Plot loss
         self.plot_loss(train_history, val_history)
 
-        # Convert to np-array
-        seq_to_plot = data.get_x_test().squeeze().cpu().numpy()
+        # # Convert to np-array
+        # seq_to_plot = data.get_x_test().squeeze().cpu().numpy()
 
-        # Make forecast
-        forecast, combined_index = self.forecast(seq_to_plot, data.raw_test, data.last_date)
+        # # Make forecast
+        # forecast, combined_index = self.forecast(seq_to_plot, data.raw_test, data.last_date)
 
-        # Gather forecast data for plotting
-        original_cases =    data.scaler.inverse_transform(np.expand_dims(seq_to_plot[-1], axis=0)).flatten()
-        forecasted_cases =  data.scaler.inverse_transform(np.expand_dims(forecast, axis=0)).flatten()
+        # self.logger.debug(f"Seq_To_Plot shape: {np.shape(seq_to_plot)}")
+        # self.logger.debug(f"Forecast shape: {np.shape(forecast)}")
 
-        # Plot & save forecast
-        self.plot_forecast(data.raw_test, original_cases, forecasted_cases, combined_index, data.first_date, data.last_date)
+        # # Gather forecast data for plotting
+        # self.logger.debug(f"Forecast changed shape: {np.shape(np.expand_dims(forecast, axis=0))}")
+        # if data.input_size > 1:
+        #     original_cases =    data.scaler.inverse_transform(np.expand_dims(seq_to_plot[-1], axis=0)[0]).flatten()
+        #     forecasted_cases =  data.scaler.inverse_transform(np.expand_dims(forecast, axis=0)).flatten()
+
+        # else:
+        #     original_cases =    data.scaler.inverse_transform(np.expand_dims(seq_to_plot[-1], axis=0)).flatten()
+        #     forecasted_cases =  data.scaler.inverse_transform(np.expand_dims(forecast, axis=0)).flatten()
+
+        # # Plot & save forecast
+        # self.plot_forecast(data.raw_test, original_cases, forecasted_cases, combined_index, data.first_date, data.last_date)
 
         return round(best_loss, 8), best_epoch
 
@@ -153,9 +164,9 @@ class LSTMUnivariate(nn.Module):
             for i in range(ARGS.look_ahead * 2):
 
                 # Prepare historical data
-                history =               torch.as_tensor(historical_data).view(1, -1, 1).float().to(self.device)
+                history =               torch.as_tensor(historical_data).view(1, -1, self.input_size).float().to(self.device)
 
-                # Make predictions
+                # Make predictionsh
                 prediction =            self(history).cpu().numpy()[0, 0]
                 forecast.append(prediction[0])
                 
@@ -198,7 +209,7 @@ class LSTMUnivariate(nn.Module):
         plt.rcParams['figure.figsize'] = [14, 4]
 
         plt.plot(raw_test.index[-100:-30], raw_test.Open[-100:-30], label="Test Data",     color="blue")
-        plt.plot(raw_test.index[-30:],     original_cases,          label="Actual Values", color="green")
+        plt.plot(raw_test.index[-30:],     original_cases[-30:],          label="Actual Values", color="green")
         plt.plot(combined_index[-60:],     forecasted_cases,        label="Forecast",      color="red")
 
         plt.xlabel("Time Step")
@@ -253,9 +264,12 @@ class LSTMUnivariate(nn.Module):
                 batch_x, batch_y = batch_x.to(self.device), batch_y.to(self.device)
 
             # Make predictions
+            self.logger.debug(f"Batch_X Input shape: {batch_x.shape}")
             predictions = self(batch_x)
 
             # Calculate loss
+            self.logger.debug(f"Predictions shape: {predictions.shape}")
+            self.logger.debug(f"Batch_Y shape: {batch_y.shape}")
             loss = self.loss_func(predictions, batch_y)
             self.optimizer.zero_grad()
             loss.backward()

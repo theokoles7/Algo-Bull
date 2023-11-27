@@ -22,7 +22,7 @@ if __name__ == '__main__':
         # INITIALIZATION ==========================================================================
 
         # Initialize output directory
-        output_dir = f"{ARGS.output_path}/{ARGS.ticker}/{ARGS.variables}/{ARGS.epochs}_epochs/{datetime.datetime.now().strftime('%Y%m%d_%H%M%S')}"
+        output_dir = f"{ARGS.output_path}/{ARGS.ticker}/{ARGS.variability}/{ARGS.epochs}_epochs/{datetime.datetime.now().strftime('%Y%m%d_%H%M%S')}"
         os.makedirs(output_dir, exist_ok=True)
 
         # Initialize data set and model
@@ -41,7 +41,7 @@ if __name__ == '__main__':
         LOGGER.info("Recording results")
         results_file = pd.read_csv('experiments/results.csv')
         results_file.loc[
-            (results_file['VARIABILITY']==ARGS.variables) &
+            (results_file['VARIABILITY']==ARGS.variability) &
             (results_file['TICKER']==ARGS.ticker) &
             (results_file['EPOCHS']==ARGS.epochs),
             ['BEST ACCURACY', 'BEST EPOCH'] 
